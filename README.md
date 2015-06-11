@@ -12,8 +12,8 @@ var secrets = new Secrets([
   'access_token_secret'
 ]);
 
-console.log(secrets.values.consumer_key);
-console.log(secrets.values.consumer_secret);
+console.log(secrets.values.consumer_key);    // "myconsumerkey"
+console.log(secrets.values.consumer_secret); // "myconsumersecret"
 ```
 
 ## Installation
