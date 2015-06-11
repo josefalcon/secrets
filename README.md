@@ -3,7 +3,7 @@
 Secrets is a small library for reading secrets files or environment variables.
 
 ```javascript
-var secrets = require('secrets');
+var Secrets = require('secrets');
 
 var secrets = new Secrets([
   'consumer_key',
