@@ -85,7 +85,7 @@ secrets.values.consumer_key
 
 The `values` property is an object containing a value for every key the
 secrets object was initialized with. This can be used and passed directly
-to API libraries that require secrest for authentication.
+to API libraries that require secrets for authentication.
 
 ```javascript
 var Secrets = require('secrets');
