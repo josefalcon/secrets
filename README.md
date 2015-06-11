@@ -75,6 +75,31 @@ The secrets file is read _synchronously_ when the object is constructed.
 > Note: Secrets should never be committed to source control. Update `.gitignore`
 > to prevent your secrets file from accidentally ending up in a public space.
 
+## Reading
+
+Secrets are read through the `values` property.
+
+```javascript
+secrets.values.consumer_key
+```
+
+The `values` property is an object containing a value for every key the
+secrets object was initialized with. This can be used and passed directly
+to API libraries that require secrest for authentication.
+
+```javascript
+var Secrets = require('secrets');
+var Twitter = require('twitter');
+
+var secrets = new Secrets([
+  'consumer_key',
+  'consumer_secret',
+  'access_token_key',
+  'access_token_secret'
+]);
+
+var client = new Twitter(secrets.values);
+```
 ## Options
 
 TODO:
