@@ -26,7 +26,7 @@ npm install secrets
 
 Secrets are resolved in the following order,
 
-0. Environment variables
+0. Environment variables,
 0. Secrets file
 
 Environment variables are resolved by querying `process.env` for each key
@@ -38,9 +38,24 @@ uppercasing the value. No other transformation is done to the key.
 process.env[key.toUpperCase()]
 ```
 
+If a specified key is `undefined` or `null` after resolution, an error
+is thrown.
+
 ## Secrets File
 
-The backup secrets file can be configured by passing an options object to the
+Secrets files are specified in a _flat_ JSON file.
+
+```json
+{
+  "consumer_key": "myconsumerkey",
+  "consumer_secret": "myconsumersecret",
+  "access_token_key": "myaccesstoken",
+  "access_token_secret": "myaccessstokensecret"
+}
+```
+
+By default, the backup file is assumed to be `secrets.json` in the working
+directory. However, this can be configured by passing an options object to the
 constructor.
 
 ```javascript
@@ -55,8 +70,7 @@ var secrets = new Secrets({
 })
 ```
 
-By default, the backup file is assumed to be `secrets.json` in the working
-directory.
+The secrets file is read _synchronously_ when the object is constructed.
 
 > Note: Secrets should never be committed to source control. Update `.gitignore`
 > to prevent your secrets file from accidentally ending up in a public space.
