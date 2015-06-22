@@ -36,10 +36,12 @@ Secrets.prototype.init = function(file, keys) {
   });
 };
 
+// from: http://underscorejs.org/docs/underscore.html
 function isArray(obj) {
-  return toString.call(obj) === '[object Array]';
+  return Object.prototype.toString.call(obj) === '[object Array]';
 };
 
+// from: http://underscorejs.org/docs/underscore.html
 function isObject(obj) {
   var type = typeof obj;
   return type === 'function' || type === 'object' && !!obj;
