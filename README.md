@@ -24,10 +24,10 @@ npm install secrets
 
 ## Resolution
 
-Secrets are resolved in the following order,
+By default secrets are resolved in the following order,
 
 0. Environment variables,
-0. Secrets file
+0. secrets.json
 
 Environment variables are resolved by querying `process.env` for each key
 specified in the constructor. By convention, environment variables are
@@ -41,9 +41,34 @@ process.env[key.toUpperCase()]
 If a specified key is `undefined` or `null` after resolution, an error
 is thrown.
 
-## Secrets File
+TODO: should there be an option to disable such errors?
 
-Secrets files are specified in a _flat_ JSON file.
+If keys cannot be resolved through `process.env`, a secret file called
+`secrets.json` is read from the current working directory.
+
+### Explicit Resolution Order
+
+Explicit resolution order is specified by manually passing in fallback objects
+to the constructor after the list of keys.
+
+```javascript
+var inMemoryValues = {
+  // ...
+};
+
+var secrets = new Secrets([
+  'consumer_key',
+  'consumer_secret',
+  'access_token_key',
+  'access_token_secret'
+], localStorage, inMemoryValues, process.env, '/path/to/secrets.json');
+```
+
+Specify files as fallbacks by passing the path as a string.
+
+## Secret Files
+
+Secret files are specified in a _flat_ JSON file.
 
 ```json
 {
@@ -54,23 +79,8 @@ Secrets files are specified in a _flat_ JSON file.
 }
 ```
 
-By default, the backup file is assumed to be `secrets.json` in the working
-directory. However, this can be configured by passing an options object to the
-constructor.
-
-```javascript
-var secrets = new Secrets({
-  file: '/path/to/secrets.json',
-  keys: [
-    'consumer_key',
-    'consumer_secret',
-    'access_token_key',
-    'access_token_secret'
-  ],
-})
-```
-
-The secrets file is read _synchronously_ when the object is constructed.
+Secret files are read _synchronously_ when the object is constructed. A file is
+only read if it is needed to resolve keys.
 
 > Note: Secrets should never be committed to source control. Update `.gitignore`
 > to prevent your secrets file from accidentally ending up in a public space.

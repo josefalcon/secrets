@@ -1,45 +1,58 @@
 var fs = require('fs');
 
-var Secrets = function(opts) {
-  var file = 'secrets.json';
-  var keys;
-
-  if (isArray(opts)) {
-    keys = opts;
-  } else if (isObject(opts)) {
-    file = opts.file || file;
-    keys = opts.keys;
-  }
-
+var Secrets = function(keys) {
   if (!keys) throw new Error('no keys defined');
 
-  this.values = {}
-  this.init(file, keys);
-};
+  var values = this.values = {};
+  var fallbacks = Array.prototype.slice.call(arguments, 1);
+  if (!fallbacks || fallbacks.length === 0) {
+    fallbacks = [process.env, 'secrets.json'];
+  }
 
-Secrets.prototype.init = function(file, keys) {
-  var self = this;
-  var env = process.env;
-  var fb = {};
+  var unset = keys;
+  for (var i = 0; unset.length > 0 && i < fallbacks.length; i++) {
+    var fallback = fallbacks[i];
+    if (isString(fallback)) fallback = this.readFile(fallback);
+    if (!isObject(fallback)) throw new Error('invalid fallback: not an object');
 
-  try {
-    fb = JSON.parse(fs.readFileSync(file));
-  } catch(err) {
-    // ignore file errors
+    unset = this.resolve(unset, fallback);
   }
 
   keys.forEach(function(k) {
-    var v = env[k.toUpperCase()] || fb[k];
+    var v = values[k];
     if (v === undefined || v === null) throw new Error(k + ' is undefined');
-
-    self.values[k] = v;
   });
+}
+
+Secrets.prototype.readFile = function(file) {
+  try {
+    return JSON.parse(fs.readFileSync(file));
+  } catch(err) {
+    // ignore file errors
+    return {};
+  }
+};
+
+Secrets.prototype.resolve = function(keys, obj) {
+  var self = this;
+  var unset = [];
+  var upper = obj == process.env;
+
+  keys.forEach(function(k) {
+    var v = upper ? obj[k.toUpperCase()] : obj[k];
+    if (v === undefined || v === null) {
+      unset.push(k);
+    } else {
+      self.values[k] = v;
+    }
+  });
+  return unset;
 };
 
 // from: http://underscorejs.org/docs/underscore.html
-function isArray(obj) {
-  return Object.prototype.toString.call(obj) === '[object Array]';
-};
+function isString(obj) {
+  return Object.prototype.toString.call(obj) === '[object String]';
+}
 
 // from: http://underscorejs.org/docs/underscore.html
 function isObject(obj) {
